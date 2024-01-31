@@ -62,6 +62,13 @@ public:
   /// NOTE: name must be defined in constructor in C++ engines, this can only be used in python scripted ones
   virtual void setName(QString name);
 
+  /// Inverse dose calculation capabilities
+  bool isInverse()const;
+
+  /// set inverse capabilities
+  /// NOTE: this can only be used in python scripted ones
+  virtual void setIsInverse(bool isInverse);
+
 // Dose calculation related functions
 public:
   /// Perform dose calculation for a single beam
@@ -233,6 +240,10 @@ private:
 protected:
   /// Name of the engine. Must be set in dose engine constructor
   QString m_Name;
+  
+  /// Is the dose engine inverse? (i.e. it is able to calculate a beamlet dose matrix for optimization)
+  /// Is false by default, but can be set in the dose engine constructor
+  bool m_IsInverse = false;
 
 protected:
   QScopedPointer<qSlicerAbstractDoseEnginePrivate> d_ptr;

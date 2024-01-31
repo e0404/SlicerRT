@@ -119,6 +119,18 @@ void qSlicerAbstractDoseEngine::setName(QString name)
 }
 
 //----------------------------------------------------------------------------
+bool qSlicerAbstractDoseEngine::isInverse() const
+{
+    return this->m_IsInverse;
+}
+
+void qSlicerAbstractDoseEngine::setIsInverse(bool isInverse)
+{
+    // TODO: is this correct to avoid setting the value except for Python engines?
+    qCritical() << Q_FUNC_INFO << ": Cannot set dose engine name by method, only in constructor";
+}
+
+//----------------------------------------------------------------------------
 QString qSlicerAbstractDoseEngine::calculateDose(vtkMRMLRTBeamNode* beamNode)
 {
   if (!beamNode)
