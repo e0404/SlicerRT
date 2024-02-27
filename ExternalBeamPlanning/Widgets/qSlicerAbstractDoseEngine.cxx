@@ -286,7 +286,7 @@ QString qSlicerAbstractDoseEngine::calculateDoseInfluenceMatrix(vtkMRMLRTBeamNod
 QString qSlicerAbstractDoseEngine::calculateDoseInfluenceMatrixUsingEngine(vtkMRMLRTBeamNode* beamNode)
 {
 	qCritical() << Q_FUNC_INFO << ": Inverse dose calculation not implemented";
-	return QString();
+    return QString();
 }
 //---------------------------------------------------------------------------
 void qSlicerAbstractDoseEngine::addIntermediateResult(vtkMRMLNode* result, vtkMRMLRTBeamNode* beamNode)
