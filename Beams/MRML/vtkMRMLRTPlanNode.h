@@ -26,14 +26,9 @@
 
 #include "vtkSlicerBeamsModuleMRMLExport.h"
 
-
-// External Beam Planning includes
-//#include "vtkSlicerExternalBeamPlanningModuleMRMLExport.h"
-
 // MRML includes
 #include <vtkMRMLNode.h>
 #include <vtkMRMLScene.h>
-//#include <vtkMRMLObjectiveNode.h>
 
 // SegmentationCore includes
 #include "vtkOrientedImageData.h"
@@ -45,7 +40,7 @@ class vtkMRMLMarkupsFiducialNode;
 class vtkMRMLRTBeamNode;
 class vtkMRMLScalarVolumeNode;
 class vtkMRMLSegmentationNode;
-class vtkMRMLObjectiveNode;
+//class vtkMRMLObjectiveNode;
 
 /// \ingroup SlicerRt_QtModules_Beams
 class VTK_SLICER_BEAMS_MODULE_MRML_EXPORT vtkMRMLRTPlanNode : public vtkMRMLNode
@@ -202,10 +197,10 @@ public:
   /// Set optimization engine name
   void SetPlanOptimizerName(const char* optimizerName);
 
-  /// Get available objectives
-  vtkGetMacro(PlanOptimizerAvailableObjectives, std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>>);
-  /// Set available objectives from selected optimizer
-  void SetPlanOptimizerAvailableObjectives(std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> availableObjectives);
+  // Get available objectives
+  //vtkGetMacro(PlanOptimizerAvailableObjectives, std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>>);
+  // Set available objectives from selected optimizer
+  //void SetPlanOptimizerAvailableObjectives(std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> availableObjectives);
 
   /// Get prescription dose
   vtkGetMacro(RxDose, double);
@@ -259,7 +254,7 @@ protected:
   char* PlanOptimizerName;
 
   /// Get available Objectives
-  std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> PlanOptimizerAvailableObjectives;
+  //std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> PlanOptimizerAvailableObjectives;
 
   ///TODO: Allow user to specify dose volume resolution different from reference volume
   /// (currently output dose volume has the same spacing as the reference anatomy)
