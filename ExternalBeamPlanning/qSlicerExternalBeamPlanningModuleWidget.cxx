@@ -1358,6 +1358,10 @@ void qSlicerExternalBeamPlanningModuleWidget::PlanOptimizerChanged(const QString
   planNode->DisableModifiedEventOff();
   
   selectedEngine->setAvailableObjectives();
+
+  //d->ObjectivesTableWidget->setAvailableObjectives(selectedEngine->availableObjectives());
+  //objectivesTableWidget->updateObjectivesTable();
+  d->ObjectivesTableWidget->deleteObjectivesTable();
 }
 
 //-----------------------------------------------------------------------------
