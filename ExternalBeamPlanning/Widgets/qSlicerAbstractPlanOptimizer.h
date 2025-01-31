@@ -12,7 +12,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  This file was originally developed by Niklas Wahl, German Cancer Research Center (DKFZ)
+  This file was originally developed by ...
 
 ==============================================================================*/
 
@@ -21,9 +21,17 @@
 
 #include "qSlicerExternalBeamPlanningModuleWidgetsExport.h"
 
+// Objectives includes
+#include "qSlicerAbstractObjective.h"
+
 // Qt includes
 #include <QObject>
 #include <QStringList>
+#include <QVariant>
+#include <QMap>
+
+// vtk includes
+#include <vtkSmartPointer.h>
 
 class qSlicerAbstractPlanOptimizerPrivate;
 class vtkMRMLScalarVolumeNode;
@@ -31,6 +39,7 @@ class vtkMRMLRTBeamNode;
 class vtkMRMLRTPlanNode;
 class vtkMRMLNode;
 class qMRMLBeamParametersTabWidget;
+class vtkMRMLRTObjectiveNode;
 
 /// \ingroup SlicerRt_QtModules_ExternalBeamPlanning
 /// \brief Abstract Optimization calculation algorithm that can be used in the
@@ -45,6 +54,10 @@ class Q_SLICER_MODULE_EXTERNALBEAMPLANNING_WIDGETS_EXPORT qSlicerAbstractPlanOpt
   Q_PROPERTY(QString name READ name WRITE setName)
 
 public:
+    /// Maximum Gray value for visualization window/level of the newly created per-beam dose volumes
+    static double DEFAULT_DOSE_VOLUME_WINDOW_LEVEL_MAXIMUM;
+
+public:
   typedef QObject Superclass;
   /// Constructor
   explicit qSlicerAbstractPlanOptimizer(QObject* parent=nullptr);
@@ -57,12 +70,30 @@ public:
   /// NOTE: name must be defined in constructor in C++ engines, this can only be used in python scripted ones
   virtual void setName(QString name);
 
+public:
+    struct ObjectiveStruct
+    {
+        std::string name;
+        std::map<std::string, std::string> parameters;
+    };
+
 // Optimization calculation related functions
 public:
   /// Perform Optimization calculation for a single beam
   /// \param Beam node for which the Optimization is calculated
   /// \return Error message. Empty string on success
   QString optimizePlan(vtkMRMLRTPlanNode* planNode);
+
+  /// Get available objectives for the Optimization engine
+  std::vector<ObjectiveStruct> getAvailableObjectives();
+  /// Set available objectives for the Optimization engine
+  virtual void setAvailableObjectives();
+
+  /// Get saved objectives for the Optimization engine
+  std::vector<vtkSmartPointer<vtkMRMLRTObjectiveNode>> getSavedObjectives();
+  void saveObjectiveInOptimizer(vtkSmartPointer<vtkMRMLRTObjectiveNode> objective);
+
+  void removeAllObjectives();
 
 // API functions to implement in the subclass
 protected:
@@ -72,16 +103,24 @@ protected:
   ///
   /// \param planNode Plan for which the Optimization is carried out. 
   /// \param resultOptimizationVolumeNode Output volume node for the result Optimization. It is created by \sa optimizePlan
-  virtual QString optimizePlanUsingOptimizer(
-    vtkMRMLRTPlanNode* planNode,
-    vtkMRMLScalarVolumeNode* resultOptimizationVolumeNode ) = 0;
+    virtual QString optimizePlanUsingOptimizer(
+        vtkMRMLRTPlanNode* planNode,
+        std::vector<vtkSmartPointer<vtkMRMLRTObjectiveNode>> objectives,
+        vtkMRMLScalarVolumeNode* resultOptimizationVolumeNode ) = 0;
+
 
 protected:
   /// Name of the engine. Must be set in Optimization engine constructor
   QString m_Name;
 
+
+
 protected:
   QScopedPointer<qSlicerAbstractPlanOptimizerPrivate> d_ptr;
+
+  std::vector<ObjectiveStruct> availableObjectives;
+  std::vector<vtkSmartPointer<vtkMRMLRTObjectiveNode>> savedObjectives;
+
 
 private:
   Q_DECLARE_PRIVATE(qSlicerAbstractPlanOptimizer);
@@ -89,6 +128,15 @@ private:
   friend class qSlicerPlanOptimizerPluginHandler;
   friend class qSlicerPlanOptimizerLogic;
   friend class qSlicerExternalBeamPlanningModuleWidget;
+
+
+public:
+    /// Add result per-beam dose volume to beam
+    /// \param resultDose Dose volume to add to beam as result
+    /// \param beamNode Beam node to add dose as result to
+    /// \param replace Remove referenced dose volume if already exists. True by default
+    Q_INVOKABLE void addResultDose(vtkMRMLScalarVolumeNode* resultDose, vtkMRMLRTPlanNode* planNode, bool replace = true);
 };
+Q_DECLARE_METATYPE(qSlicerAbstractPlanOptimizer::ObjectiveStruct)
 
 #endif

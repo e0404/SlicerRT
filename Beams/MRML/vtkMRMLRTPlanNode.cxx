@@ -40,7 +40,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkSmartPointer.h>
 #include <vtkVariant.h>
-
 //------------------------------------------------------------------------------
 const char* vtkMRMLRTPlanNode::ISOCENTER_FIDUCIAL_NAME = "Isocenter";
 const int vtkMRMLRTPlanNode::ISOCENTER_FIDUCIAL_INDEX = 0;
@@ -254,6 +253,19 @@ void vtkMRMLRTPlanNode::SetPlanOptimizerName(const char* optimizerName)
   this->Modified();
   this->InvokeEvent(vtkMRMLRTPlanNode::PlanOptimizerChanged, this);
 }
+
+////----------------------------------------------------------------------------
+//void vtkMRMLRTPlanNode::SetPlanOptimizerAvailableObjectives(std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> availableObjectives)
+//{
+//  if (!availableObjectives.empty())
+//  {
+//    this->PlanOptimizerAvailableObjectives = availableObjectives;
+//  }
+//  else
+//  {
+//    this->PlanOptimizerAvailableObjectives = std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>>();
+//  }
+//}
 
 //----------------------------------------------------------------------------
 void vtkMRMLRTPlanNode::ProcessMRMLEvents(vtkObject *caller, unsigned long eventID, void *callData)

@@ -23,6 +23,9 @@
 // Beams includes
 #include "vtkMRMLRTPlanNode.h"
 
+// Objectives includes
+#include "qSlicerSquaredDeviationObjective.h"
+
 // SlicerQt includes
 #include "qSlicerScriptedUtils_p.h"
 
@@ -33,10 +36,12 @@
 // MRML includes
 #include <vtkMRMLScene.h>
 #include <vtkMRMLScalarVolumeNode.h>
+#include <vtkMRMLRTObjectiveNode.h>
 
 // VTK includes
 #include <vtkSmartPointer.h>
 #include <vtkPythonUtil.h>
+#include <vtkCollection.h>
 
 // Qt includes
 #include <QDebug>
@@ -188,12 +193,32 @@ void qSlicerScriptedPlanOptimizer::setName(QString name)
 }
 
 //-----------------------------------------------------------------------------
-QString qSlicerScriptedPlanOptimizer::optimizePlanUsingOptimizer(vtkMRMLRTPlanNode* planNode, vtkMRMLScalarVolumeNode* resultOptimizationVolumeNode)
+QString qSlicerScriptedPlanOptimizer::optimizePlanUsingOptimizer(vtkMRMLRTPlanNode* planNode, std::vector<vtkSmartPointer<vtkMRMLRTObjectiveNode>> objectives, vtkMRMLScalarVolumeNode* resultOptimizationVolumeNode)
 {
   Q_D(const qSlicerScriptedPlanOptimizer);
-  PyObject* arguments = PyTuple_New(2);
+  // transform objectives to python list
+  PyObject* pyList = PyList_New(objectives.size());
+  for (size_t i = 0; i < objectives.size(); i++)
+  {
+	  vtkMRMLRTObjectiveNode* objectiveNode = objectives[i];
+      if (objectiveNode)
+      {
+          PyObject* pyDict = PyDict_New();
+          //PyDict_SetItemString(pyDict, "Objective", Py_BuildValue("s", objectiveNode->GetName()));
+          //std::string segment = objectiveNode->GetSegmentation();
+          //PyDict_SetItemString(pyDict, "Segment", Py_BuildValue("s", segment.c_str()));
+          //PyList_SetItem(pyList, i, pyDict);
+          PyObject* pyObjectiveNode = vtkPythonUtil::GetObjectFromPointer(objectiveNode);
+          PyDict_SetItemString(pyDict, "ObjectiveNode", pyObjectiveNode);
+          PyList_SetItem(pyList, i, pyDict);
+
+      }
+  }
+  
+  PyObject* arguments = PyTuple_New(3);
   PyTuple_SET_ITEM(arguments, 0, vtkPythonUtil::GetObjectFromPointer(planNode));
-  PyTuple_SET_ITEM(arguments, 1, vtkPythonUtil::GetObjectFromPointer(resultOptimizationVolumeNode));
+  PyTuple_SET_ITEM(arguments, 1, pyList);
+  PyTuple_SET_ITEM(arguments, 2, vtkPythonUtil::GetObjectFromPointer(resultOptimizationVolumeNode));
   qDebug() << d->PythonSource << ": Calling optimizePlanUsingOptimizer from Python Plan Optimizer";
   PyObject* result = d->PythonCppAPI.callMethod(d->OptimizePlanUsingOptimizerMethod, arguments);
   Py_DECREF(arguments);
@@ -211,4 +236,60 @@ QString qSlicerScriptedPlanOptimizer::optimizePlanUsingOptimizer(vtkMRMLRTPlanNo
     }
 
   return PyString_AsString(result);
+}
+
+
+//-----------------------------------------------------------------------------
+void qSlicerScriptedPlanOptimizer::setAvailableObjectives()
+{
+    //available Objectives:
+    //[
+    //	"DoseUniformity",
+    //		"EUD",
+    //		"MaxDVH",
+    //		"MeanDose",
+    //		"MinDVH",
+    //		"SquaredDeviation",
+    //		"SquaredOverdosing",
+    //		"SquaredUnderdosing",
+    //]
+	// mock objectives
+	std::vector<ObjectiveStruct> objectives;
+
+	ObjectiveStruct eud;
+	eud.name = "EUD";
+	eud.parameters["parameter 1"] = "1.0";
+	objectives.push_back(eud);
+
+    ObjectiveStruct MaxDVH;
+	MaxDVH.name = "Max DVH";
+	MaxDVH.parameters["parameter 1"] = "1.0";
+	objectives.push_back(MaxDVH);
+
+	ObjectiveStruct MeanDose;
+	MeanDose.name = "Mean Dose";
+	MeanDose.parameters["parameter 1"] = "1.0";
+	objectives.push_back(MeanDose);
+
+	ObjectiveStruct MinDVH;
+	MinDVH.name = "Min DVH";
+	MinDVH.parameters["parameter 1"] = "1.0";
+	objectives.push_back(MinDVH);
+
+	ObjectiveStruct SquaredDeviation;
+	SquaredDeviation.name = "Squared Deviation";
+	SquaredDeviation.parameters["parameter 1"] = "1.0";
+	objectives.push_back(SquaredDeviation);
+
+	ObjectiveStruct SquaredOverdosing;
+	SquaredOverdosing.name = "Squared Overdosing";
+	SquaredOverdosing.parameters["parameter 1"] = "1.0";
+	objectives.push_back(SquaredOverdosing);
+
+	ObjectiveStruct SquaredUnderdosing;
+	SquaredUnderdosing.name = "Squared Underdosing";
+	SquaredUnderdosing.parameters["parameter 1"] = "1.0";
+	objectives.push_back(SquaredUnderdosing);
+
+    this->availableObjectives = objectives;
 }

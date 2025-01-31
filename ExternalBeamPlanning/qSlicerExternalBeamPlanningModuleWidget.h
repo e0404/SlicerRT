@@ -102,6 +102,11 @@ protected slots:
   void addBeamClicked();
   void removeBeamClicked();
 
+  // ObjectiveTable
+  void addObjectiveClicked();
+  void removeObjectiveClicked();
+  void saveAvailableObjectives();
+
   // Update functions
   void onLogicModified();
   void onProgressUpdated(double progress);

@@ -28,7 +28,15 @@
 // MRML includes
 #include <vtkMRMLModelNode.h>
 
+// Eigen includes
 #include <itkeigen/Eigen/SparseCore>
+
+// VTK includes
+#include <vtkObject.h>
+#include <vtkSmartPointer.h>
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
+#include <vtkFieldData.h>
 
 class vtkPolyData;
 class vtkMRMLScene;
@@ -37,6 +45,7 @@ class vtkMRMLRTPlanNode;
 class vtkMRMLScalarVolumeNode;
 class vtkMRMLSegmentationNode;
 class vtkMRMLLinearTransformNode;
+
 
 /// \ingroup SlicerRt_QtModules_Beams
 class VTK_SLICER_BEAMS_MODULE_MRML_EXPORT vtkMRMLRTBeamNode : public vtkMRMLModelNode
@@ -60,6 +69,7 @@ public:
   typedef std::vector<double> DoseInfluenceMatrixValueVector;
   typedef std::vector<int> DoseInfluenceMatrixIndexVector;
   typedef Eigen::SparseMatrix<double, Eigen::ColMajor, int> DoseInfluenceMatrixType;
+
 
 public:
   static vtkMRMLRTBeamNode *New();
@@ -221,6 +231,15 @@ public:
 
   /// Set Dose influence matrix from triplets
   void SetDoseInfluenceMatrixFromTriplets(int numRows, int numCols, DoseInfluenceMatrixIndexVector& rows, DoseInfluenceMatrixIndexVector& columns, DoseInfluenceMatrixValueVector& values);
+
+  /// Get Dose Influence Matrix
+  vtkSmartPointer<vtkDoubleArray> GetDoseInfluenceMatrixTriplets();
+
+  vtkSmartPointer<vtkDoubleArray> GetDoseInfluenceMatrixData();
+  vtkSmartPointer<vtkIntArray> GetDoseInfluenceMatrixIndices();
+  vtkSmartPointer<vtkIntArray> GetDoseInfluenceMatrixIndptr();
+
+  vtkSmartPointer<vtkFieldData> GetDoseInfluenceMatrixFieldData();
 
 protected:
   /// Create beam model from beam parameters, supporting MLC leaves

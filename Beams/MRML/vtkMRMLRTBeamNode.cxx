@@ -935,6 +935,7 @@ void vtkMRMLRTBeamNode::SetDoseInfluenceMatrixFromTriplets(int numRows, int numC
   this->DoseInfluenceMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
 }
 
+//---------------------------------------------------------------------------
 int vtkMRMLRTBeamNode::GetDoseInfluenceMatrixRows()
 {
   return this->DoseInfluenceMatrix.rows();
@@ -950,4 +951,67 @@ int vtkMRMLRTBeamNode::GetDoseInfluenceMatrixNumberOfNonZeroElements()
 double vtkMRMLRTBeamNode::GetDoseInfluenceMatrixSparsity()
 {
   return this->DoseInfluenceMatrix.nonZeros() / (this->DoseInfluenceMatrix.rows() * this->DoseInfluenceMatrix.cols());
+}
+
+//---------------------------------------------------------------------------
+vtkSmartPointer<vtkDoubleArray> vtkMRMLRTBeamNode::GetDoseInfluenceMatrixTriplets()
+{
+  vtkSmartPointer<vtkDoubleArray> triplets = vtkSmartPointer<vtkDoubleArray>::New();
+  triplets->SetNumberOfComponents(3); // each triplet has 3 components: row, col, value
+
+  for (int k = 0; k < this->DoseInfluenceMatrix.outerSize(); ++k)
+  {
+      for (Eigen::SparseMatrix<double, Eigen::ColMajor, int>::InnerIterator it(this->DoseInfluenceMatrix, k); it; ++it)
+      {
+          double triplet[3] = { static_cast<double>(it.row()), static_cast<double>(it.col()), it.value() };
+          triplets->InsertNextTuple(triplet);
+      }
+  }
+
+  return triplets;
+}
+
+//---------------------------------------------------------------------------
+vtkSmartPointer<vtkDoubleArray> vtkMRMLRTBeamNode::GetDoseInfluenceMatrixData()
+{
+  vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
+  data->SetArray(this->DoseInfluenceMatrix.valuePtr(), this->DoseInfluenceMatrix.nonZeros(), 1);
+  return data;
+}
+
+vtkSmartPointer<vtkIntArray> vtkMRMLRTBeamNode::GetDoseInfluenceMatrixIndices()
+{
+  vtkSmartPointer<vtkIntArray> indices = vtkSmartPointer<vtkIntArray>::New();
+  indices->SetArray(this->DoseInfluenceMatrix.innerIndexPtr(), this->DoseInfluenceMatrix.nonZeros(), 1);
+  return indices;
+}
+
+vtkSmartPointer<vtkIntArray> vtkMRMLRTBeamNode::GetDoseInfluenceMatrixIndptr()
+{
+  vtkSmartPointer<vtkIntArray> indptr = vtkSmartPointer<vtkIntArray>::New();
+  indptr->SetArray(this->DoseInfluenceMatrix.outerIndexPtr(), this->DoseInfluenceMatrix.outerSize() + 1, 1);
+  return indptr;
+}
+
+//---------------------------------------------------------------------------
+vtkSmartPointer<vtkFieldData> vtkMRMLRTBeamNode::GetDoseInfluenceMatrixFieldData()
+{
+  vtkSmartPointer<vtkFieldData> fieldData = vtkSmartPointer<vtkFieldData>::New();
+
+  vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
+  data->SetName("Data");
+  data->SetArray(this->DoseInfluenceMatrix.valuePtr(), this->DoseInfluenceMatrix.nonZeros(), 1);
+  fieldData->AddArray(data);
+
+  vtkSmartPointer<vtkIntArray> indices = vtkSmartPointer<vtkIntArray>::New();
+  indices->SetName("Indices");
+  indices->SetArray(this->DoseInfluenceMatrix.innerIndexPtr(), this->DoseInfluenceMatrix.nonZeros(), 1);
+  fieldData->AddArray(indices);
+
+  vtkSmartPointer<vtkIntArray> indptr = vtkSmartPointer<vtkIntArray>::New();
+  indptr->SetName("Indptr");
+  indptr->SetArray(this->DoseInfluenceMatrix.outerIndexPtr(), this->DoseInfluenceMatrix.outerSize() + 1, 1);
+  fieldData->AddArray(indptr);
+
+  return fieldData;
 }

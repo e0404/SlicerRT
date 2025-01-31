@@ -34,6 +34,8 @@
 // Widgets includes
 #include "qSlicerDoseEnginePluginHandler.h"
 #include "qSlicerMockDoseEngine.h"
+#include "qSlicerPlanOptimizerPluginHandler.h"
+#include "qSlicerMockPlanOptimizer.h"
 
 // SlicerRT includes
 #include "vtkSlicerBeamsModuleLogic.h"
@@ -160,7 +162,7 @@ void qSlicerExternalBeamPlanningModule::setup()
   
   
   //Register optimizers
-  //No C++ optimizer yet
+  qSlicerPlanOptimizerPluginHandler::instance()->registerPlanOptimizer(new qSlicerMockPlanOptimizer());
 
   // Python optimizers
   // (otherwise it would be the responsibility of the module that embeds the plan optimizer)
