@@ -66,9 +66,9 @@ vtkMRMLRTPlanNode::vtkMRMLRTPlanNode()
 
   this->DoseEngineName = nullptr;
 
-  this->DoseGrid[0] = 0;
-  this->DoseGrid[1] = 0;
-  this->DoseGrid[2] = 0;
+  this->DoseGrid[0] = 5.0;
+  this->DoseGrid[1] = 5.0;
+  this->DoseGrid[2] = 5.0;
 
   this->IonPlanFlag = false;
 }
@@ -955,4 +955,34 @@ bool vtkMRMLRTPlanNode::ComputeTargetVolumeCenter(double center[3])
   }
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkMRMLRTPlanNode::setDoseGridInCoordinate(int index, double value)
+{
+    if (index < 0 || index > 2)
+    {
+        vtkErrorMacro("setDoseGridInCoordinate: Invalid index");
+        return;
+    }
+
+    this->DoseGrid[index] = value;
+}
+
+//----------------------------------------------------------------------------
+void vtkMRMLRTPlanNode::setDoseGridToCTGrid()
+{
+    vtkMRMLScalarVolumeNode* referenceVolumeNode = this->GetReferenceVolumeNode();
+    if (!referenceVolumeNode)
+    {
+        vtkErrorMacro("setDoseGridToCTGrid: Invalid reference volume node");
+        return;
+    }
+
+	double spacing[3] = { 0.0, 0.0, 0.0 };
+    referenceVolumeNode->GetImageData()->GetSpacing(spacing);
+
+    this->setDoseGridInCoordinate(0, spacing[0]);
+    this->setDoseGridInCoordinate(1, spacing[1]);
+    this->setDoseGridInCoordinate(2, spacing[2]);
 }

@@ -197,18 +197,20 @@ public:
   /// Set optimization engine name
   void SetPlanOptimizerName(const char* optimizerName);
 
-  // Get available objectives
-  //vtkGetMacro(PlanOptimizerAvailableObjectives, std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>>);
-  // Set available objectives from selected optimizer
-  //void SetPlanOptimizerAvailableObjectives(std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> availableObjectives);
-
   /// Get prescription dose
   vtkGetMacro(RxDose, double);
   /// Set prescription dose
   vtkSetMacro(RxDose, double);
 
+  /// Get dose grid size
   vtkSetVector3Macro(DoseGrid, double);
   vtkGetVector3Macro(DoseGrid, double);
+
+  /// Set dose grid in one coordinate
+  void setDoseGridInCoordinate(int index, double value);
+
+  /// Set dose grid to ct grid
+  void setDoseGridToCTGrid();
 
   /// Get flag for ion plan
   vtkGetMacro( IonPlanFlag, bool);
@@ -253,11 +255,7 @@ protected:
   /// Name of the selected optimization engine
   char* PlanOptimizerName;
 
-  /// Get available Objectives
-  //std::vector<vtkSmartPointer<vtkMRMLObjectiveNode>> PlanOptimizerAvailableObjectives;
-
-  ///TODO: Allow user to specify dose volume resolution different from reference volume
-  /// (currently output dose volume has the same spacing as the reference anatomy)
+  /// Allows user to specify dose volume resolution different from reference volume
   double DoseGrid[3];
 
   /// Flag, indicates that a plan node is an ion plan node
