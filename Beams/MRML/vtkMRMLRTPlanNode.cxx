@@ -980,7 +980,7 @@ void vtkMRMLRTPlanNode::setDoseGridToCTGrid()
     }
 
 	double spacing[3] = { 0.0, 0.0, 0.0 };
-    referenceVolumeNode->GetImageData()->GetSpacing(spacing);
+    referenceVolumeNode->GetSpacing(spacing);
 
     this->setDoseGridInCoordinate(0, spacing[0]);
     this->setDoseGridInCoordinate(1, spacing[1]);
